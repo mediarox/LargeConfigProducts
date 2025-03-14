@@ -7,8 +7,10 @@
 namespace Elgentos\LargeConfigProducts\Console\Command;
 
 use Elgentos\LargeConfigProducts\Model\Prewarmer;
+use Exception;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
 use Magento\Framework\Phrase\RendererInterface;
 use Symfony\Component\Console\Command\Command;
@@ -18,49 +20,46 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PrewarmerCommand extends Command
 {
-    /**
-     * @var RendererInterface
-     */
-    private $phraseRenderer;
-    /**
-     * @var State
-     */
-    private $state;
-    /**
-     * @var Prewarmer
-     */
-    private $prewarmer;
-
-    /**
-     * PrewarmerCommand constructor.
-     *
-     * @param RendererInterface $phraseRenderer
-     * @param State             $state
-     * @param Prewarmer         $prewarmer
-     */
     public function __construct(
-        RendererInterface $phraseRenderer,
-        State $state,
-        Prewarmer $prewarmer
+        private RendererInterface $phraseRenderer,
+        private State $state,
+        private Prewarmer $prewarmer
     ) {
         parent::__construct();
-        $this->phraseRenderer = $phraseRenderer;
-        $this->state = $state;
-        $this->prewarmer = $prewarmer;
     }
 
     protected function configure()
     {
         $this->setName('lcp:prewarm');
-        $this->setDescription('Prewarm product options JSON for Large Configurable Products');
-        $this->addOption('products', 'p', InputOption::VALUE_OPTIONAL, 'Product IDs to prewarm (comma-seperated)');
-        $this->addOption('storecodes', 's', InputOption::VALUE_OPTIONAL, 'Storecodes to prewarm (comma-seperated)');
-        $this->addOption('force', 'f', InputOption::VALUE_OPTIONAL, 'Force prewarming even if record already exists', false);
+        $this->setDescription(
+            'Prewarm product options JSON for Large Configurable Products'
+        );
+        $this->addOption(
+            'products',
+            'p',
+            InputOption::VALUE_OPTIONAL,
+            'Product IDs to prewarm (comma-seperated)'
+        );
+        $this->addOption(
+            'storecodes',
+            's',
+            InputOption::VALUE_OPTIONAL,
+            'Storecodes to prewarm (comma-seperated)'
+        );
+        $this->addOption(
+            'force',
+            'f',
+            InputOption::VALUE_OPTIONAL,
+            'Force prewarming even if record already exists',
+            false
+        );
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
+     * @param  InputInterface  $input
+     * @param  OutputInterface $output
+     * @throws LocalizedException
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -70,7 +69,7 @@ class PrewarmerCommand extends Command
         Phrase::setRenderer($this->phraseRenderer);
 
         // Echo out instead of using output->writeln due to 'Area code not set' error. This error will not be shown (for some reason) when there has been output sent.
-        echo 'Prewarming'.PHP_EOL;
+        echo 'Prewarming' . PHP_EOL;
 
         $productIdsToWarm = [];
 
@@ -93,10 +92,16 @@ class PrewarmerCommand extends Command
 
         $force = $input->getOption('force');
 
-        $result = $this->prewarmer->prewarm($productIdsToWarm, $storeCodesToWarm, $force);
+        $result = $this->prewarmer->prewarm(
+            $productIdsToWarm,
+            $storeCodesToWarm,
+            $force
+        );
 
         $output->writeln($result);
 
         $output->writeln('Done prewarming');
+
+        return 0;
     }
 }

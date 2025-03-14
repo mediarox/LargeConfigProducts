@@ -7,16 +7,8 @@ use Magento\Framework\Indexer\IndexerRegistry;
 
 class AfterUpdateAttributesPlugin
 {
-    private $indexer;
-
-    /**
-     * AfterUpdateAttributesPlugin constructor.
-     *
-     * @param IndexerRegistry $indexerRegistry
-     */
-    public function __construct(IndexerRegistry $indexerRegistry)
+    public function __construct(private IndexerRegistry $indexerRegistry)
     {
-        $this->indexer = $indexerRegistry->get('elgentos_lcp_prewarm');
     }
 
     /**
@@ -35,8 +27,9 @@ class AfterUpdateAttributesPlugin
         $attrData,
         $storeId
     ) {
-        if (!$this->indexer->isScheduled()) {
-            $this->indexer->reindexList($productIds);
+        $indexer = $this->indexerRegistry->get('elgentos_lcp_prewarm');
+        if (!$indexer->isScheduled()) {
+            $indexer->reindexList($productIds);
         }
 
         return $action;

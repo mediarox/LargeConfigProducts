@@ -2,8 +2,7 @@
 
 namespace Elgentos\LargeConfigProducts\Model\Indexer;
 
-use Elgentos\LargeConfigProducts\Model\MessageQueues\Publisher as Publisher;
-use Magento\Catalog\Model\ResourceModel\Product\Collection as ProductCollection;
+use Elgentos\LargeConfigProducts\Model\MessageQueues\Publisher;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
@@ -15,47 +14,14 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Prewarm implements IndexerActionInterface, MviewActionInterface
 {
-    /**
-     * @var ProductCollectionFactory
-     */
-    public $productCollectionFactory;
-    private $storeManager;
-    private $messageManager;
-    private $output;
-    /**
-     * @var State
-     */
-    private $state;
-
-    /**
-     * @var PublisherNotifier
-     */
-    protected $publisher;
-
-    /**
-     * Product constructor.
-     *
-     * @param StoreManagerInterface    $storeManager
-     * @param ManagerInterface         $messageManager
-     * @param ConsoleOutput            $output
-     * @param State                    $state
-     * @param Publisher                $publisher
-     * @param ProductCollectionFactory $productCollectionFactory
-     */
     public function __construct(
-        StoreManagerInterface $storeManager,
-        ManagerInterface $messageManager,
-        ConsoleOutput $output,
-        State $state,
-        Publisher $publisher,
-        ProductCollectionFactory $productCollectionFactory
+        private StoreManagerInterface $storeManager,
+        private ManagerInterface $messageManager,
+        private ConsoleOutput $output,
+        private State $state,
+        private Publisher $publisher,
+        public ProductCollectionFactory $productCollectionFactory
     ) {
-        $this->publisher = $publisher;
-        $this->storeManager = $storeManager;
-        $this->messageManager = $messageManager;
-        $this->output = $output;
-        $this->state = $state;
-        $this->productCollectionFactory = $productCollectionFactory;
     }
 
     public function execute($productIds)
@@ -65,8 +31,7 @@ class Prewarm implements IndexerActionInterface, MviewActionInterface
         } catch (\Exception $e) {
         }
 
-        if (!is_array($productIds)) {
-            /** @var ProductCollection $collection */
+        if (!\is_array($productIds) || empty($productIds)) {
             $collection = $this->productCollectionFactory->create();
             $productIds = $collection->addAttributeToFilter('type_id', 'configurable')->getAllIds();
         }
@@ -78,7 +43,7 @@ class Prewarm implements IndexerActionInterface, MviewActionInterface
 
     public function executeFull()
     {
-        $this->execute(null);
+        $this->execute([]);
     }
 
     public function executeList(array $ids)

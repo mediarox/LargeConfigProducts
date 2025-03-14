@@ -17,7 +17,7 @@ class StoreIdStatic
     /**
      * @param $storeId
      */
-    public function setStoreId($storeId)
+    public function setStoreId($storeId): void
     {
         self::$storeId = $storeId;
     }

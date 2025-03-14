@@ -7,21 +7,22 @@
 //"swatchRenderer": {
 ?>
 <?php /** @var $block \Magento\Swatches\Block\Product\Renderer\Configurable */ ?>
+<?php /** @var $escaper \Magento\Framework\Escaper */ ?>
 <div class="swatch-opt" data-role="swatch-options"></div>
 
 <script type="text/x-magento-init">
     {
         "[data-role=swatch-options]": {
             "Magento_Swatches/js/swatch-renderer": {
-                "baseUrl": "<?php echo $block->getBaseUrl(); ?>",
-                "jsonConfig": null<? /* @escapeNotVerified */ //echo $swatchOptions = $block->getJsonConfig() ?>,
-                "jsonSwatchConfig": <?php /* @noEscape */ echo $block->getJsonSwatchConfig(); ?>,
+                "baseUrl": "<?= $block->getBaseUrl() ?>",
+                "jsonConfig": null,
+                "jsonSwatchConfig": "<?= $block->getJsonSwatchConfig() ?>",
                 "mediaCallback": "<?= /* @escapeNotVerified */ $block->getMediaCallback() ?>",
-                "gallerySwitchStrategy": "<?php /* @escapeNotVerified */ echo $block->getVar('gallery_switch_strategy','Magento_ConfigurableProduct') ?: 'replace'; ?>",
-                "jsonSwatchImageSizeConfig": <?php /* @noEscape */ echo $block->getJsonSwatchSizeConfig() ?: 'null'; ?>
+                "gallerySwitchStrategy": "<?= $block->getVar('gallery_switch_strategy','Magento_ConfigurableProduct') ?: 'replace' ?>",
+                "jsonSwatchImageSizeConfig": "<?= $block->getJsonSwatchSizeConfig() ?: 'null' ?>"
             },
             "Magento_Swatches/js/configurable-customer-data": {
-                    "swatchOptions": null<?php /* @noEscape */ //echo $swatchOptions ?>
+                    "swatchOptions": null
             }
         }
     }

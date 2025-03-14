@@ -16,21 +16,9 @@ use Magento\Store\Model\StoreManagerInterface;
  */
 class AttributeOptionProviderPlugin
 {
-    /** @var StoreIdStatic */
-    public $storeIdValueObject;
-
-    /** @var StoreManagerInterface */
-    protected $storeManager;
-
-    /**
-     * AttributeOptionProviderPlugin constructor.
-     *
-     * @param StoreManagerInterface $storeManager
-     * @param StoreIdStatic         $storeIdValueObject
-     */
     public function __construct(
-        StoreManagerInterface $storeManager,
-        StoreIdStatic $storeIdValueObject
+        protected StoreManagerInterface $storeManager,
+        public StoreIdStatic $storeIdValueObject
     ) {
         $this->storeManager = $storeManager;
         $this->storeIdValueObject = $storeIdValueObject;

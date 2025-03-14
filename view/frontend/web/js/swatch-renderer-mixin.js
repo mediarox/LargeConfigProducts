@@ -1,6 +1,7 @@
 define([
-    'jquery'
-], function ($) {
+    'jquery',
+    'underscore'
+], function ($, _) {
     'use strict';
 
     return function (widget) {
@@ -42,7 +43,7 @@ define([
 
                     // Preselect swatch if only 1 swatch exists
                     const selectSwatch = document.querySelectorAll('.swatch-option');
-                    if($(selectSwatch).length == 1) {
+                    if($(selectSwatch).length === 1) {
                         $(selectSwatch).trigger("click");
                     }
                 });

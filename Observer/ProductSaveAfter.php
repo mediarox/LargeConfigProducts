@@ -7,16 +7,8 @@ use Magento\Framework\Indexer\IndexerRegistry;
 
 class ProductSaveAfter implements ObserverInterface
 {
-    private $indexer;
-
-    /**
-     * ProductSaveAfter constructor.
-     *
-     * @param IndexerRegistry $indexerRegistry
-     */
-    public function __construct(IndexerRegistry $indexerRegistry)
+    public function __construct(private IndexerRegistry $indexerRegistry)
     {
-        $this->indexer = $indexerRegistry->get('elgentos_lcp_prewarm');
     }
 
     /**
@@ -25,8 +17,12 @@ class ProductSaveAfter implements ObserverInterface
     public function execute(
         \Magento\Framework\Event\Observer $observer
     ) {
-        if (!$this->indexer->isScheduled()) {
-            $this->indexer->reindexRow($observer->getProduct()->getId());
+        $indexer = $this->indexerRegistry->get('elgentos_lcp_prewarm');
+        if (!$indexer->isScheduled()) {
+            $indexer->reindexRow(
+                $observer->getProduct()
+                    ->getId()
+            );
         }
     }
 }

@@ -4,27 +4,25 @@ declare(strict_types=1);
 
 namespace Elgentos\LargeConfigProducts\Cache;
 
+use CredisException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\DeploymentConfig;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\RuntimeException;
 
 class CredisClientFactory
 {
-    /**
-     * @var DeploymentConfig
-     */
-    private $deploymentConfig;
-
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-
-    public function __construct(DeploymentConfig $deploymentConfig, ScopeConfigInterface $scopeConfig)
-    {
-        $this->deploymentConfig = $deploymentConfig;
-        $this->scopeConfig = $scopeConfig;
+    public function __construct(
+        private DeploymentConfig $deploymentConfig,
+        private ScopeConfigInterface $scopeConfig
+    ) {
     }
 
+    /**
+     * @throws FileSystemException
+     * @throws CredisException
+     * @throws RuntimeException
+     */
     public function create(): \Credis_Client
     {
         $cacheSetting = $this->deploymentConfig->get('cache');
@@ -38,12 +36,24 @@ class CredisClientFactory
             $database = $backendOptions['database'];
             $port = $backendOptions['port'];
         } else {
-            $server = $this->scopeConfig->getValue('elgentos_largeconfigproducts/prewarm/redis_host') ?? 'localhost';
+            $server = $this->scopeConfig->getValue(
+                'elgentos_largeconfigproducts/prewarm/redis_host'
+            ) ?? 'localhost';
 
-            $port = $this->scopeConfig->getValue('elgentos_largeconfigproducts/prewarm/redis_port') ?? 6379;
-            $database = $this->scopeConfig->getValue('elgentos_largeconfigproducts/prewarm/redis_db_index') ?? 4;
+            $port = $this->scopeConfig->getValue(
+                'elgentos_largeconfigproducts/prewarm/redis_port'
+            ) ?? 6379;
+            $database = $this->scopeConfig->getValue(
+                'elgentos_largeconfigproducts/prewarm/redis_db_index'
+            ) ?? 4;
         }
 
-        return new \Credis_Client($server, $port, $timeout, $persistent, $database);
+        return new \Credis_Client(
+            $server,
+            $port,
+            $timeout,
+            $persistent,
+            $database
+        );
     }
 }
